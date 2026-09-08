@@ -3,62 +3,68 @@ import json
 import random
 import subprocess
 import urllib.request
-import openai
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-HISTORY_FILE = "processed_history.txt"
-
-# Silicon Valley Proxy Layer: Global unblocked public proxy engines to bypass all device check-ins
-INVIDIOUS_INSTANCES = [
-    "https://flokinet.to",
-    "https://melmac.space",
-    "https://perennialte.ch",
-    "https://yewtu.be"
-]
-
 def download_and_slice(video_url):
-    # Extract clean alphanumeric unique video ID safely from user manual dashboard link
-    if "youtu.be/" in video_url:
-        video_id = video_url.split("youtu.be/")[-1].split("?")[0]
-    elif "v=" in video_url:
-        video_id = video_url.split("v=")[-1].split("&")[0]
-    else:
-        video_id = video_url.strip()
-
-    print(f"[INFO] Bypassing data center restriction loops for Video ID: {video_id}")
+    clean_url = video_url.strip().replace(" ", "")
+    print(f"[INFO] Initializing robust hybrid ingestion layer for URL: {clean_url}")
     
-    # Select random secondary network mirror nodes to completely shatter tracking walls
-    instance = random.choice(INVIDIOUS_INSTANCES)
-    direct_stream_url = f"{instance}/latest_version?id={video_id}&itag=22"
+    # Silicon Valley Layer 1: Simulated high-end edge client headers
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    ]
+    chosen_agent = random.choice(user_agents)
     
-    print(f"[INFO] Ingesting validated packet matrix directly from proxy mirror node...")
+    # Layer 2: Execute direct authenticated stream capture using strict browser network masks
+    download_cmd = [
+        "yt-dlp",
+        "--no-warnings",
+        "--geo-bypass",
+        "--user-agent", chosen_agent,
+        "--referer", "https://google.com",
+        "--extractor-args", "youtube:player_client=android,web",
+        "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "-o", "raw_source.mp4",
+        clean_url
+    ]
     
-    # Headless server client identification mask headers configuration
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    req = urllib.request.Request(direct_stream_url, headers=headers)
+    print("[INFO] Executing primary ingestion workflow loop...")
+    subprocess.run(download_cmd)
     
-    try:
-        with urllib.request.urlopen(req, timeout=30) as response:
-            with open("raw_source.mp4", "wb") as f:
-                f.write(response.read())
-        print("[SUCCESS] Media array captured clean and stored in system root memory workspace.")
-    except Exception as api_err:
-        print("[WARNING] Primary proxy mirror failed. Executing ultimate yt-dlp fallback protocol...")
-        fallback_cmd = ["yt-dlp", "--no-warnings", "--geo-bypass", "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best", "-o", "raw_source.mp4", f"https://youtube.com{video_id}"]
-        subprocess.run(fallback_cmd)
+    # Layer 3: Ultimate Invidious Proxy Network Fallback Strategy
+    if not os.path.exists("raw_source.mp4") or os.path.getsize("raw_source.mp4") == 0:
+        print("[WARNING] Primary extraction intercepted by security gate. Routing via proxy network nodes...")
+        
+        if "youtu.be/" in clean_url:
+            v_id = clean_url.split("youtu.be/")[-1].split("?")[0]
+        elif "v=" in clean_url:
+            v_id = clean_url.split("v=")[-1].split("&")[0]
+        else:
+            v_id = clean_url
+            
+        proxy_url = f"https://perennialte.ch{v_id}&itag=22"
+        try:
+            req = urllib.request.Request(proxy_url, headers={'User-Agent': chosen_agent})
+            with urllib.request.urlopen(req, timeout=30) as response:
+                with open("raw_source.mp4", "wb") as f:
+                    f.write(response.read())
+            print("[SUCCESS] Media array captured clean via proxy bypass channel.")
+        except Exception as proxy_err:
+            print(f"[ERROR] Proxy node returned validation error: {str(proxy_err)}")
 
     if not os.path.exists("raw_source.mp4") or os.path.getsize("raw_source.mp4") == 0:
         raise Exception("[FATAL NETWORK EXCEPTION] All ingestion pipelines blocked by security blocks. Workspace asset null.")
-
+        
     print("[INFO] Initializing high-precision 5-second matrix boundary slicing...")
     subprocess.run(["ffmpeg", "-y", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
     
     segments = [f for f in os.listdir() if f.startswith("segment_") and f.endswith(".mp4")]
     if not segments:
-        raise Exception("[FATAL BUFFER ERROR] Slicing architecture returned empty array blocks.")
+        raise Exception("[FATAL BUFFER ERROR] Slicing architecture returned zero valid media structures.")
 
     while len(segments) < 108:
         segments += segments
@@ -70,7 +76,7 @@ def apply_fx_and_render_mashup(segments):
     print("[INFO] Deploying Multi-FX rendering filters (Klasky-Invert Matrix, 1.2x Pitch Matrix, 1.5x Volume Amplification)...")
     processed_files = []
     
-    # Duration selector configured natively to guarantee dynamic runtime length matching 2:00 to 9:00 minutes bounds
+    # Dynamically scales video duration bounds natively between 2:00 and 9:00 minutes
     target_count = random.randint(24, 108)
     print(f"[METRIC LIFECYCLE] Dynamic runtime configuration locked at: {target_count} blocks ({target_count * 5} total seconds).")
     
@@ -82,7 +88,7 @@ def apply_fx_and_render_mashup(segments):
             "-af", "asetrate=44100*1.2,atempo=1.0,volume=1.5",
             "-c:v", "libx264", "-c:a", "aac", output_clip
         ]
-        subprocess.run(ffmpeg_cmd)
+        subprocess.run(ffmpeg_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         processed_files.append(output_clip)
         
     print("[INFO] Stitching transformed structural cells into unified master output media matrix...")
@@ -103,7 +109,6 @@ def upload_unlisted_draft_to_studio():
         
     youtube = build("youtube", "v3", credentials=credentials)
     
-    # Strictly maps unlisted deployment architecture variables to hold draft state parameters inside YT Studio Dashboard
     body = {
         "snippet": {
             "title": "DRAFT - Automated Multi-FX Visual Compilation (Pending Manual Edit)", 
