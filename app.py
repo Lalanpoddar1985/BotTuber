@@ -2,31 +2,55 @@ import os
 import json
 import random
 import subprocess
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
+import requests
+import time
 
 def download_and_slice(video_url):
-    if "youtu.be/" in video_url:
-        video_id = video_url.split("youtu.be/")[-1].split("?")[0]
-    elif "v=" in video_url:
-        video_id = video_url.split("v=")[-1].split("&")[0]
-    else:
-        video_id = video_url
-
-    print(f"[INFO] Accessing official Google Video Payload Infrastructure for ID: {video_id}")
+    clean_url = video_url.strip()
+    print(f"[INFO] Routing ingestion layer via mirror architecture for URL: {clean_url}")
     
-    # Authenticated safe parameters to fetch data clear of standard data center bot verification flags
-    subprocess.run(["yt-dlp", "--no-warnings", "-f", "bestvideo+bestaudio/best", "-o", "raw_source.mp4", f"https://youtube.com{video_id}"])
+    # Utilizing an open-source distributed cobalt instance engine to completely bypass YouTube data center blocks
+    api_url = "https://cobalt.tools"
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "url": clean_url,
+        "videoQuality": "720", # Optimized for fast rendering on virtual cloud instances
+        "downloadMode": "default"
+    }
     
-    print("[INFO] Initializing strict 5-second structural slicing matrix...")
+    try:
+        response = requests.post(api_url, headers=headers, json=payload, timeout=30)
+        response_data = response.json()
+        
+        if response_data.get("status") == "error":
+            raise Exception(f"Mirror API returned business error log: {response_data.get('text')}")
+            
+        stream_url = response_data.get("url")
+        if not stream_url:
+            raise Exception("Isolate stream endpoint array returned empty node trees.")
+            
+        print("[INFO] Direct streaming binary package located. Pulling asset down to workspace...")
+        video_file = requests.get(stream_url, timeout=60)
+        with open("raw_source.mp4", "wb") as f:
+            f.write(video_file.content)
+            
+    except Exception as network_exception:
+        raise Exception(f"[FATAL NETWORK BYPASS PIPELINE CRASH] Mirror routing layer failed: {str(network_exception)}")
+    
+    if not os.path.exists("raw_source.mp4") or os.path.getsize("raw_source.mp4") == 0:
+        raise Exception("[FATAL] Source file ingest validation failed. Asset size is 0 bytes.")
+        
+    print("[INFO] Initializing high-precision 5-second matrix boundary slicing...")
     subprocess.run(["ffmpeg", "-y", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
     
     segments = [f for f in os.listdir() if f.startswith("segment_") and f.endswith(".mp4")]
-    if not os.path.exists("raw_source.mp4") or not segments:
-        raise Exception("[FATAL BUFFER ERROR] Slicing architecture returned zero valid media structures. File ingest sequence failed.")
+    if not segments:
+        raise Exception("[FATAL BUFFER ERROR] Slicing architecture returned zero valid media structures.")
 
+    # Automatically loop video cells if source runtime cannot satisfy minimum duration restrictions
     while len(segments) < 108:
         segments += segments
         
@@ -37,6 +61,7 @@ def apply_fx_and_render_mashup(segments):
     print("[INFO] Deploying Multi-FX rendering filters (Klasky-Invert Matrix, 1.2x Pitch Matrix, 1.5x Volume Amplification)...")
     processed_files = []
     
+    # Silicon Valley Duration Engine: Scaled natively between 24 (2 minutes) and 108 (9 minutes) segment blocks
     target_count = random.randint(24, 108)
     print(f"[METRIC LIFECYCLE] Dynamic runtime configuration locked at: {target_count} blocks ({target_count * 5} total seconds).")
     
