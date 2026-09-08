@@ -8,16 +8,16 @@ from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-# Permanent memory storage log to prevent double uploading the same asset
+# Permanent transaction memory database log to ensure zero duplicated uploads
 HISTORY_FILE = "processed_history.txt"
 
-# Array of permanent premium children content channels verified by you
+# Silicon Valley Identity Store: Verified Premium Sources verified by user
 SOURCE_CHANNELS = [
-    "https://youtube.com/@cocomelon",
-    "https://youtube.com/@chuchutv",
-    "https://youtube.com/@bebefinn",
-    "https://youtube.com/@pinkfong",
-    "https://youtube.com/@babyshark"
+    "https://youtube.com",
+    "https://youtube.com",
+    "https://youtube.com",
+    "https://youtube.com",
+    "https://youtube.com"
 ]
 
 def get_already_processed_ids():
@@ -31,31 +31,31 @@ def save_processed_id(video_id):
         f.write(f"{video_id}\n")
 
 def fetch_latest_video_from_random_source():
-    print("[INFO] Selecting a random source channel from your custom list...")
+    print("[INFO] Selecting a random target domain from premium child-entertainment logs...")
     selected_channel = random.choice(SOURCE_CHANNELS)
-    print(f"[INFO] Scanning target source: {selected_channel}")
+    print(f"[INFO] Operational scope assigned to source: {selected_channel}")
     
-    # Extract the latest video ID from the chosen channel
+    # Executing localized extraction of the current trending metadata stream
     cmd = ["yt-dlp", "--playlist-items", "1", "--get-id", f"{selected_channel}/videos"]
     result = subprocess.run(cmd, capture_output=True, text=True)
     video_id = result.stdout.strip()
     
     if not video_id:
-        raise Exception(f"[ERROR] Could not extract video from channel: {selected_channel}")
+        raise Exception(f"[FATAL ERROR] API/Scraper communication failure on: {selected_channel}")
         
-    # Memory Validation: Never upload the same video asset twice
+    # Memory Interception: Block already rendered assets
     processed_ids = get_already_processed_ids()
     if video_id in processed_ids:
-        print(f"[MEMORY LOG] Video ID {video_id} has already been published. Skipping execution to prevent duplicates.")
+        print(f"[MEMORY SUPPRESSION] Asset ID {video_id} found in history. Execution halted to protect channel authority.")
         return None
 
     return video_id
 
 def download_and_slice(video_url):
-    print("[INFO] Initiating high-speed video download from verified source...")
+    print("[INFO] Executing high-bandwidth packet ingestion from source nodes...")
     subprocess.run(["yt-dlp", "-f", "bestvideo+bestaudio/best", "-o", "raw_source.mp4", video_url])
     
-    print("[INFO] Slicing source asset into mandatory 5-second segments...")
+    print("[INFO] Slicing source stream into isolated 5-second sub-buffers...")
     subprocess.run(["ffmpeg", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
     
     segments = [f for f in os.listdir() if f.startswith("segment_") and f.endswith(".mp4")]
@@ -63,12 +63,13 @@ def download_and_slice(video_url):
     return segments
 
 def apply_advanced_transformations(segments):
-    print("[INFO] Applying multi-effects, transformations, and custom sound variations (Klasky style, 1.2x pitch, 1.5x volume gain)...")
+    print("[INFO] Processing audio-visual parameters (Klasky-Invert Matrix, 1.2x Pitch Matrix, 1.5x Volume Gain)...")
     processed_files = []
     
-    # Dynamic Duration Control: 24 clips = 2 minutes, 102 clips = 8 minutes 30 seconds
+    # Silicon Valley Duration Engine: Configured specifically for 2:00 to 8:30 min variations
+    # 24 clips minimum * 5s = 120s (2 mins) | 102 clips maximum * 5s = 510s (8.5 mins)
     target_count = random.randint(24, 102)
-    print(f"[DYNAMIC LENGTH] Constructing a new version composed of {target_count} randomized 5-second variations.")
+    print(f"[METRIC ENGINE] Target array length assigned: {target_count} clip structures.")
     
     for i, clip in enumerate(segments[:target_count]):
         output_clip = f"transformed_fx_{i}.mp4"
@@ -84,18 +85,18 @@ def apply_advanced_transformations(segments):
     return processed_files
 
 def compile_final_longform(processed_files):
-    print("[INFO] Assembling all multi-effect clips into the final long-form video...")
+    print("[INFO] Packaging isolated elements into unified master broadcast matrix...")
     with open("render_list.txt", "w") as f:
         for file in processed_files:
             f.write(f"file '{file}'\n")
             
     subprocess.run(["ffmpeg", "-f", "concat", "-safe", "0", "-i", "render_list.txt", "-c", "copy", "final_render_output.mp4"])
-    print("[SUCCESS] New long-form transformation rendering complete.")
+    print("[SUCCESS] Production pipeline render completed.")
 
 def generate_ai_metadata():
-    print("[INFO] Querying AI engine for viral, high-CPM metadata optimized for USA audience...")
+    print("[INFO] Querying Generative AI for high-CPM USA metadata generation optimization...")
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    prompt = "Generate a highly engaging, viral kids YouTube Video Title, description, and high-CPM tags targeting the USA market."
+    prompt = "Act as an expert YouTube SEO manager. Generate one highly clickable viral Title, a detailed Description filled with trending high-CPM tags for a premium USA kids visual edit video."
     
     response = openai.ChatCompletion.create(
         model="gpt-4o",
@@ -104,7 +105,7 @@ def generate_ai_metadata():
     return response.choices.message['content']
 
 def upload_and_cleanup(metadata_text, video_id):
-    print("[INFO] Opening secure connection to target YouTube channel...")
+    print("[INFO] Establishing OAuth2 authenticated channel interface protocol...")
     
     client_secret_data = json.loads(os.getenv("YOUTUBE_API_SECRET"))
     token_data = json.loads(os.getenv("YOUTUBE_TOKEN"))
@@ -112,7 +113,7 @@ def upload_and_cleanup(metadata_text, video_id):
     credentials = Credentials.from_authorized_user_info(token_data)
     
     if credentials.expired and credentials.refresh_token:
-        print("[INFO] Access token expired. Automatic refresh executing...")
+        print("[INFO] Credential token lifecycle expired. Refresh protocol initiated...")
         credentials.refresh(Request())
         
     youtube = build("youtube", "v3", credentials=credentials)
@@ -120,12 +121,12 @@ def upload_and_cleanup(metadata_text, video_id):
     body = {
         "snippet": {
             "title": "Viral Kids Cartoons Multi-FX Transformation", 
-            "description": "Premium High-Definition Automated Visual Edit.",
+            "description": "Automated Content Pipeline Optimization - Premium Production Matrix.",
             "tags": ["cartoons", "kids", "animation", "viral"],
-            "categoryId": "1"
+            "categoryId": "1" # Film & Animation Scope
         },
         "status": {
-            "privacyStatus": "public" 
+            "privacyStatus": "public" # Directly pushes to live feed
         }
     }
     
@@ -133,39 +134,39 @@ def upload_and_cleanup(metadata_text, video_id):
     request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
     
     response = request.execute()
-    new_video_url = f"https://youtube.com{response.get('id')}"
-    print(f"[SUCCESS] Video successfully deployed live to your channel! URL: {new_video_url}")
+    new_video_url = f"https://www.youtube.com/watch?v={response.get('id')}"
+    print(f"[SUCCESS] Transmission completed. Target link live: {new_video_url}")
     
-    # Critical Memory Save: Save ID before hard erasure of physical assets
+    # Save target signature into history data array before clean loop execution
     save_processed_id(video_id)
     
-    print("[CLEANUP ENGINE] Erasing physical video memory from cloud storage workspace...")
+    print("[CLEANUP ENGINE] Finalizing disk storage scrub protocol. Erasing active cache memory...")
     files_to_clean = ["raw_source.mp4", "final_render_output.mp4", "render_list.txt"]
     for file in files_to_clean:
         if os.path.exists(file):
             os.remove(file)
             
-    # Purge all short slices and effect versions from system memory
+    # Purge all remaining segment files immediately
     for item in os.listdir():
         if item.startswith("segment_") or item.startswith("transformed_fx_"):
             os.remove(item)
-    print("[SUCCESS] Disk memory cleared. System optimized for next cycle.")
+    print("[SUCCESS] Hardware workspace memory cleared and structurally optimized.")
 
 def main():
     try:
         video_id = fetch_latest_video_from_random_source()
         if video_id is None:
-            return  # Stops execution safely if video ID matches history file
+            return  # Clean termination if duplicate is detected by memory filter
 
-        video_url = f"https://youtube.com{video_id}"
+        video_url = f"https://www.youtube.com/watch?v={video_id}"
         segments = download_and_slice(video_url)
         fx_clips = apply_advanced_transformations(segments)
         compile_final_longform(fx_clips)
         metadata = generate_ai_metadata()
         upload_and_cleanup(metadata, video_id)
-        print("[SYSTEM] Autonomous Cycle Executed and Safely Logged.")
+        print("[SYSTEM] Pipeline cycle completed successfully.")
     except Exception as e:
-        print(f"[SYSTEM ENGINE FAILURE] Handled Exception: {str(e)}")
+        print(f"[PROTECTED FAULT] Error trace handled: {str(e)}")
 
 if __name__ == "__main__":
     main()
