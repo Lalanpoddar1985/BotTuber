@@ -2,8 +2,6 @@ import os
 import json
 import random
 import subprocess
-import re
-import urllib.request
 import openai
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -12,13 +10,13 @@ from google.auth.transport.requests import Request
 
 HISTORY_FILE = "processed_history.txt"
 
-# Silicon Valley Fix: Maps custom handles directly to official immutable YouTube Channel IDs
-CHANNEL_FEEDS = [
-    "https://youtube.com",  # Cocomelon
-    "https://youtube.com",  # ChuChu TV
-    "https://youtube.com",  # Bebefinn
-    "https://youtube.com",  # Pinkfong
-    "https://youtube.com"   # Baby Shark
+# Immutably mapped official Channel IDs for bulletproof API lookup
+CHANNEL_IDS = [
+    "UCbCmjCuTUZos6Inko4u57UQ",  # Cocomelon
+    "UC6zZJu_mS9OclgA99w0ElAg",  # ChuChu TV
+    "UC_8_Ew7D7Xf5A2zRAs89Rsg",  # Bebefinn
+    "UC47Ehk70ZSGnInY7iKDuH_A",  # Pinkfong
+    "UC_wL-6uN_C7p8GgC_VreYVw"   # Baby Shark
 ]
 
 def get_already_processed_ids():
@@ -31,37 +29,44 @@ def save_processed_id(video_id):
     with open(HISTORY_FILE, "a") as f:
         f.write(f"{video_id}\n")
 
-def fetch_latest_video_from_rss():
-    print("[INFO] Selecting an encrypted RSS entry stream node randomly...")
-    selected_feed = random.choice(CHANNEL_FEEDS)
-    print(f"[INFO] Accessing bulletproof RSS stream payload: {selected_feed}")
+def fetch_latest_video_via_official_api():
+    print("[INFO] Initializing secure Google YouTube Data API interface...")
     
-    try:
-        # Securely fetch XML data directly via standard secure web requests (Bypasses all scraper blocks)
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        req = urllib.request.Request(selected_feed, headers=headers)
-        with urllib.request.urlopen(req, timeout=15) as response:
-            xml_content = response.read().decode('utf-8')
-            
-        # Regex expression pattern to capture the absolute latest video entry ID instantly
-        video_ids = re.findall(r'<yt:videoId>([^<]+)</yt:videoId>', xml_content)
+    # Reconstructing internal authentication tokens from GitHub Secrets
+    token_data = json.loads(os.getenv("YOUTUBE_TOKEN"))
+    credentials = Credentials.from_authorized_user_info(token_data)
+    
+    if credentials.expired and credentials.refresh_token:
+        print("[INFO] Requesting refreshed credential access lifecycles...")
+        credentials.refresh(Request())
         
-        if not video_ids:
-            raise Exception("XML parsing layout returned empty node streams.")
-            
-        target_id = video_ids[0].strip()
-        print(f"[SUCCESS] Official YouTube backend data match located: {target_id}")
-        return target_id
+    youtube = build("youtube", "v3", credentials=credentials)
+    
+    selected_channel = random.choice(CHANNEL_IDS)
+    print(f"[INFO] API querying selected channel endpoint node: {selected_channel}")
+    
+    # Executing clean, official search queries to capture the absolute latest upload
+    request = youtube.search().list(
+        part="snippet",
+        channelId=selected_channel,
+        maxResults=1,
+        order="date",
+        type="video"
+    )
+    response = request.execute()
+    
+    if not response.get("items"):
+        raise Exception(f"[FATAL API FAILURE] Channel payload returned empty item trees for: {selected_channel}")
         
-    except Exception as network_error:
-        raise Exception(f"[XML FETCH FAILURE] Primary bypass pipeline crashed: {str(network_error)}")
+    target_video_id = response["items"][0]["id"]["videoId"]
+    print(f"[SUCCESS] Official API validated video asset discovered: {target_video_id}")
+    return target_video_id
 
 def download_and_slice(video_url):
-    print("[INFO] Initiating high-speed video download from verified source...")
-    # Cleaned arguments to eliminate output naming configuration conflicts on cloud networks
+    print("[INFO] Initiating dynamic payload download...")
     subprocess.run(["yt-dlp", "--no-warnings", "-f", "bestvideo+bestaudio/best", "-o", "raw_source.mp4", video_url])
     
-    print("[INFO] Slicing source asset into mandatory 5-second segments...")
+    print("[INFO] Executing precision 5-second matrix slicing...")
     subprocess.run(["ffmpeg", "-y", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
     
     segments = [f for f in os.listdir() if f.startswith("segment_") and f.endswith(".mp4")]
@@ -69,12 +74,12 @@ def download_and_slice(video_url):
     return segments
 
 def apply_advanced_transformations(segments):
-    print("[INFO] Applying multi-effects, transformations, and custom sound variations (Klasky style, 1.2x pitch, 1.5x volume gain)...")
+    print("[INFO] Activating Multi-FX rendering pipelines (Klasky-Style Invert, Pitch 1.2x, Volume 1.5x)...")
     processed_files = []
     
-    # 24 to 102 clips configures the exact video runtime between 2:00 and 8:30 minutes
+    # Generates a runtime natively matching the 2:00 to 8:30 minute duration boundary
     target_count = random.randint(24, 102)
-    print(f"[DYNAMIC LENGTH] Constructing a new version composed of {target_count} randomized 5-second variations.")
+    print(f"[METRICS] Compilation array size assigned: {target_count} variations.")
     
     for i, clip in enumerate(segments[:target_count]):
         output_clip = f"transformed_fx_{i}.mp4"
@@ -90,18 +95,18 @@ def apply_advanced_transformations(segments):
     return processed_files
 
 def compile_final_longform(processed_files):
-    print("[INFO] Assembling all multi-effect clips into the final long-form video...")
+    print("[INFO] Rendering composite array blocks into global longform layout...")
     with open("render_list.txt", "w") as f:
         for file in processed_files:
             f.write(f"file '{file}'\n")
             
     subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "render_list.txt", "-c", "copy", "final_render_output.mp4"])
-    print("[SUCCESS] New long-form transformation rendering complete.")
+    print("[SUCCESS] Master distribution render locked.")
 
 def generate_ai_metadata():
-    print("[INFO] Querying AI engine for viral, high-CPM metadata optimized for USA audience...")
+    print("[INFO] Extracting highly converting metadata assets via Generative AI nodes...")
     openai.api_key = os.getenv("OPENAI_API_KEY")
-    prompt = "Generate a highly engaging, viral kids YouTube Video Title, description, and high-CPM tags targeting the USA market."
+    prompt = "Generate a highly viral kids YouTube Video Title, description, and high-CPM tags targeting the USA market."
     
     response = openai.ChatCompletion.create(
         model="gpt-4o",
@@ -110,15 +115,12 @@ def generate_ai_metadata():
     return response.choices.message['content']
 
 def upload_and_cleanup(metadata_text, video_id):
-    print("[INFO] Opening secure connection to target YouTube channel...")
+    print("[INFO] Authenticating target distribution server stream...")
     
-    client_secret_data = json.loads(os.getenv("YOUTUBE_API_SECRET"))
     token_data = json.loads(os.getenv("YOUTUBE_TOKEN"))
-    
     credentials = Credentials.from_authorized_user_info(token_data)
     
     if credentials.expired and credentials.refresh_token:
-        print("[INFO] Access token expired. Automatic refresh executing...")
         credentials.refresh(Request())
         
     youtube = build("youtube", "v3", credentials=credentials)
@@ -126,7 +128,7 @@ def upload_and_cleanup(metadata_text, video_id):
     body = {
         "snippet": {
             "title": "Viral Kids Cartoons Multi-FX Transformation", 
-            "description": "Premium High-Definition Kids Visual Edit Compilation Output Matrix.",
+            "description": "Premium High-Definition Automated Production Stream.",
             "tags": ["cartoons", "kids", "animation", "viral"],
             "categoryId": "1"
         },
@@ -140,11 +142,11 @@ def upload_and_cleanup(metadata_text, video_id):
     
     response = request.execute()
     new_video_url = f"https://youtube.com{response.get('id')}"
-    print(f"[SUCCESS] Transmission completed. Target link live: {new_video_url}")
+    print(f"[SUCCESS] Broadcast successfully live! Target link: {new_video_url}")
     
     save_processed_id(video_id)
     
-    print("[CLEANUP ENGINE] Erasing physical video memory cache from cloud storage workspace...")
+    print("[CLEANUP ENGINE] Scrubbing cloud storage caches...")
     files_to_clean = ["raw_source.mp4", "final_render_output.mp4", "render_list.txt"]
     for file in files_to_clean:
         if os.path.exists(file):
@@ -153,18 +155,17 @@ def upload_and_cleanup(metadata_text, video_id):
     for item in os.listdir():
         if item.startswith("segment_") or item.startswith("transformed_fx_"):
             os.remove(item)
-    print("[SUCCESS] Disk memory cleared. System optimized for next cycle.")
+    print("[SUCCESS] Disk memory arrays wiped successfully.")
 
 def main():
     try:
-        video_id = fetch_latest_video_from_rss()
-        if video_id is None:
+        video_id = fetch_latest_video_via_official_api()
+        if not video_id:
             return  
 
-        # Memory Logic Suppression Fallback (Optional, but enabled here for strict safety logs)
         processed_ids = get_already_processed_ids()
         if video_id in processed_ids:
-            print(f"[SUPPRESSION] Data stream tracking matched historical logs for ID: {video_id}. Safely skipping execution loop.")
+            print(f"[ANTI-DUPLICATE] Asset {video_id} already exists in processed tracks. Exiting execution safely.")
             return
 
         video_url = f"https://youtube.com{video_id}"
@@ -173,7 +174,7 @@ def main():
         compile_final_longform(fx_clips)
         metadata = generate_ai_metadata()
         upload_and_cleanup(metadata, video_id)
-        print("[SYSTEM] Autonomous Cycle Executed and Safely Logged.")
+        print("[SYSTEM] Autonomous Cycle Executed and Logged Successfully.")
     except Exception as e:
         print(f"[SYSTEM ENGINE FAILURE] Handled Exception: {str(e)}")
 
