@@ -5,7 +5,7 @@ on:
       input_video_url:
         description: 'Paste Any YouTube Video URL Directly Below'
         required: true
-        default: 'https://youtu.be/vTLfOqEolsk?si=fIKWGyN929W-_87u'
+        default: 'https://youtu.be'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -14,23 +14,23 @@ jobs:
   build-and-upload-draft-matrix:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code Repository
-      uses: actions/checkout@v4
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
 
-    - name: Configure Python Environment Framework
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Configure Python Environment Framework
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install System Dependencies and Media Tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y ffmpeg
-        pip install requests google-api-python-client google-auth-oauthlib google-auth-httplib2
+      - name: Install System Dependencies and Media Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install requests google-api-python-client google-auth-oauthlib google-auth-httplib2
 
-    - name: Execute Manual Link Pipeline Engine
-      env:
-        YOUTUBE_API_SECRET: ${{ secrets.YOUTUBE_API_SECRET }}
-        YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
-        USER_VIDEO_LINK: ${{ github.event.inputs.input_video_url }}
-      run: python app.py
+      - name: Execute Manual Link Pipeline Engine
+        env:
+          YOUTUBE_API_SECRET: ${{ secrets.YOUTUBE_API_SECRET }}
+          YOUTUBE_TOKEN: ${{ secrets.YOUTUBE_TOKEN }}
+          USER_VIDEO_LINK: ${{ github.event.inputs.input_video_url }}
+        run: python app.py
