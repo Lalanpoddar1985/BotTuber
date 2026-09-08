@@ -2,44 +2,63 @@ import os
 import json
 import random
 import subprocess
+import urllib.request
+import openai
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
+HISTORY_FILE = "processed_history.txt"
+
+# Silicon Valley Proxy Layer: Global unblocked public proxy engines to bypass all device check-ins
+INVIDIOUS_INSTANCES = [
+    "https://flokinet.to",
+    "https://melmac.space",
+    "https://perennialte.ch",
+    "https://yewtu.be"
+]
+
 def download_and_slice(video_url):
-    clean_url = video_url.strip().replace(" ", "")
-    print(f"[INFO] Initializing secure direct network stream extraction for URL: {clean_url}")
+    # Extract clean alphanumeric unique video ID safely from user manual dashboard link
+    if "youtu.be/" in video_url:
+        video_id = video_url.split("youtu.be/")[-1].split("?")[0]
+    elif "v=" in video_url:
+        video_id = video_url.split("v=")[-1].split("&")[0]
+    else:
+        video_id = video_url.strip()
+
+    print(f"[INFO] Bypassing data center restriction loops for Video ID: {video_id}")
     
-    # SILICON VALLEY BYPASS MATRIX: Simulates random high-end USA consumer browsers to completely destroy YouTube bot verification flags
-    user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.3 Safari/605.1.15",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0"
-    ]
-    chosen_agent = random.choice(user_agents)
+    # Select random secondary network mirror nodes to completely shatter tracking walls
+    instance = random.choice(INVIDIOUS_INSTANCES)
+    direct_stream_url = f"{instance}/latest_version?id={video_id}&itag=22"
     
-    download_cmd = [
-        "yt-dlp",
-        "--no-warnings",
-        "--geo-bypass",
-        "--user-agent", chosen_agent,
-        "--referer", "https://youtube.com",
-        "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-        "-o", "raw_source.mp4",
-        clean_url
-    ]
-    subprocess.run(download_cmd)
+    print(f"[INFO] Ingesting validated packet matrix directly from proxy mirror node...")
     
+    # Headless server client identification mask headers configuration
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    req = urllib.request.Request(direct_stream_url, headers=headers)
+    
+    try:
+        with urllib.request.urlopen(req, timeout=30) as response:
+            with open("raw_source.mp4", "wb") as f:
+                f.write(response.read())
+        print("[SUCCESS] Media array captured clean and stored in system root memory workspace.")
+    except Exception as api_err:
+        print("[WARNING] Primary proxy mirror failed. Executing ultimate yt-dlp fallback protocol...")
+        fallback_cmd = ["yt-dlp", "--no-warnings", "--geo-bypass", "-f", "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best", "-o", "raw_source.mp4", f"https://youtube.com{video_id}"]
+        subprocess.run(fallback_cmd)
+
     if not os.path.exists("raw_source.mp4") or os.path.getsize("raw_source.mp4") == 0:
-        raise Exception("[FATAL NETWORK INGESTION] Source download sequence blocked. Asset failed to materialize.")
-        
+        raise Exception("[FATAL NETWORK EXCEPTION] All ingestion pipelines blocked by security blocks. Workspace asset null.")
+
     print("[INFO] Initializing high-precision 5-second matrix boundary slicing...")
     subprocess.run(["ffmpeg", "-y", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
     
     segments = [f for f in os.listdir() if f.startswith("segment_") and f.endswith(".mp4")]
     if not segments:
-        raise Exception("[FATAL BUFFER ERROR] Slicing architecture returned zero valid media structures.")
+        raise Exception("[FATAL BUFFER ERROR] Slicing architecture returned empty array blocks.")
 
     while len(segments) < 108:
         segments += segments
@@ -51,7 +70,7 @@ def apply_fx_and_render_mashup(segments):
     print("[INFO] Deploying Multi-FX rendering filters (Klasky-Invert Matrix, 1.2x Pitch Matrix, 1.5x Volume Amplification)...")
     processed_files = []
     
-    # Dynamic duration boundaries configured natively between 2:00 and 9:00 minutes
+    # Duration selector configured natively to guarantee dynamic runtime length matching 2:00 to 9:00 minutes bounds
     target_count = random.randint(24, 108)
     print(f"[METRIC LIFECYCLE] Dynamic runtime configuration locked at: {target_count} blocks ({target_count * 5} total seconds).")
     
@@ -84,6 +103,7 @@ def upload_unlisted_draft_to_studio():
         
     youtube = build("youtube", "v3", credentials=credentials)
     
+    # Strictly maps unlisted deployment architecture variables to hold draft state parameters inside YT Studio Dashboard
     body = {
         "snippet": {
             "title": "DRAFT - Automated Multi-FX Visual Compilation (Pending Manual Edit)", 
