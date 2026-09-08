@@ -20,13 +20,13 @@ jobs:
     - name: Configure Python Environment Framework
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11' # Upgraded to resolve deprecation warnings
 
     - name: Install System Dependencies and Media Tools
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
-        pip install yt-dlp google-api-python-client google-auth-oauthlib google-auth-httplib2
+        pip install pytube google-api-python-client google-auth-oauthlib google-auth-httplib2
 
     - name: Execute Manual Link Pipeline Engine
       env:
