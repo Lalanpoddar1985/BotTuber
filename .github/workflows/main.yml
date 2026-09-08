@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       input_video_url:
-        description: 'Target YouTube Video Link Source Input Stream'
+        description: 'Paste Any YouTube Video URL Directly Below'
         required: true
-        default: 'https://youtu.be'
+        default: 'https://youtu.be/vTLfOqEolsk?si=fIKWGyN929W-_87u'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -26,7 +26,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ffmpeg
-        pip install yt-dlp google-api-python-client google-auth-oauthlib google-auth-httplib2
+        pip install requests google-api-python-client google-auth-oauthlib google-auth-httplib2
 
     - name: Execute Manual Link Pipeline Engine
       env:
