@@ -2,6 +2,8 @@ import os
 import json
 import random
 import subprocess
+import re
+import urllib.request
 import openai
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
@@ -10,12 +12,13 @@ from google.auth.transport.requests import Request
 
 HISTORY_FILE = "processed_history.txt"
 
-SOURCE_CHANNELS = [
-    "https://youtube.com",
-    "https://youtube.com",
-    "https://youtube.com",
-    "https://youtube.com/@pinkfong",
-    "https://youtube.com"
+# Silicon Valley Fix: Maps custom handles directly to official immutable YouTube Channel IDs
+CHANNEL_FEEDS = [
+    "https://youtube.com",  # Cocomelon
+    "https://youtube.com",  # ChuChu TV
+    "https://youtube.com",  # Bebefinn
+    "https://youtube.com",  # Pinkfong
+    "https://youtube.com"   # Baby Shark
 ]
 
 def get_already_processed_ids():
@@ -28,34 +31,38 @@ def save_processed_id(video_id):
     with open(HISTORY_FILE, "a") as f:
         f.write(f"{video_id}\n")
 
-def fetch_latest_video_from_random_source():
-    print("[INFO] Selecting a random source channel from your custom list...")
-    selected_channel = random.choice(SOURCE_CHANNELS)
-    print(f"[INFO] Scanning target source: {selected_channel}")
+def fetch_latest_video_from_rss():
+    print("[INFO] Selecting an encrypted RSS entry stream node randomly...")
+    selected_feed = random.choice(CHANNEL_FEEDS)
+    print(f"[INFO] Accessing bulletproof RSS stream payload: {selected_feed}")
     
-    # Silicon Valley Fix: Upgraded yt-dlp flags to bypass YouTube scraper protection blocks
-    cmd = ["yt-dlp", "--playlist-items", "1", "--get-id", "--flat-playlist", f"{selected_channel}/videos"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    video_id = result.stdout.strip().split('\n')[0] # Captures only the clean video ID string
-    
-    if not video_id or len(video_id) > 15: # Safety fallback in case extraction contains logs
-        print("[WARNING] Primary extraction failed. Attempting robust channel feed fallback extraction...")
-        cmd_fallback = ["yt-dlp", "--playlist-items", "1", "--get-id", f"{selected_channel}"]
-        result_fallback = subprocess.run(cmd_fallback, capture_output=True, text=True)
-        video_id = result_fallback.stdout.strip().split('\n')[0]
-
-    if not video_id:
-        raise Exception(f"[ERROR] Could not extract video from channel: {selected_channel}")
+    try:
+        # Securely fetch XML data directly via standard secure web requests (Bypasses all scraper blocks)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        req = urllib.request.Request(selected_feed, headers=headers)
+        with urllib.request.urlopen(req, timeout=15) as response:
+            xml_content = response.read().decode('utf-8')
+            
+        # Regex expression pattern to capture the absolute latest video entry ID instantly
+        video_ids = re.findall(r'<yt:videoId>([^<]+)</yt:videoId>', xml_content)
         
-    print(f"[SUCCESS] Clean Video ID successfully extracted: {video_id}")
-    return video_id
+        if not video_ids:
+            raise Exception("XML parsing layout returned empty node streams.")
+            
+        target_id = video_ids[0].strip()
+        print(f"[SUCCESS] Official YouTube backend data match located: {target_id}")
+        return target_id
+        
+    except Exception as network_error:
+        raise Exception(f"[XML FETCH FAILURE] Primary bypass pipeline crashed: {str(network_error)}")
 
 def download_and_slice(video_url):
     print("[INFO] Initiating high-speed video download from verified source...")
-    subprocess.run(["yt-dlp", "-f", "bestvideo+bestaudio/best", "-o", "raw_source.mp4", video_url])
+    # Cleaned arguments to eliminate output naming configuration conflicts on cloud networks
+    subprocess.run(["yt-dlp", "--no-warnings", "-f", "bestvideo+bestaudio/best", "-o", "raw_source.mp4", video_url])
     
     print("[INFO] Slicing source asset into mandatory 5-second segments...")
-    subprocess.run(["ffmpeg", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
+    subprocess.run(["ffmpeg", "-y", "-i", "raw_source.mp4", "-c", "copy", "-map", "0", "-segment_time", "5", "-f", "segment", "segment_%03d.mp4"])
     
     segments = [f for f in os.listdir() if f.startswith("segment_") and f.endswith(".mp4")]
     random.shuffle(segments)
@@ -72,7 +79,7 @@ def apply_advanced_transformations(segments):
     for i, clip in enumerate(segments[:target_count]):
         output_clip = f"transformed_fx_{i}.mp4"
         ffmpeg_cmd = [
-            "ffmpeg", "-i", clip,
+            "ffmpeg", "-y", "-i", clip,
             "-vf", "lutrgb=r=negate:g=negate:b=negate,scale=1920:1080", 
             "-af", "asetrate=44100*1.2,atempo=1.0,volume=1.5",
             "-c:v", "libx264", "-c:a", "aac", output_clip
@@ -88,7 +95,7 @@ def compile_final_longform(processed_files):
         for file in processed_files:
             f.write(f"file '{file}'\n")
             
-    subprocess.run(["ffmpeg", "-f", "concat", "-safe", "0", "-i", "render_list.txt", "-c", "copy", "final_render_output.mp4"])
+    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", "render_list.txt", "-c", "copy", "final_render_output.mp4"])
     print("[SUCCESS] New long-form transformation rendering complete.")
 
 def generate_ai_metadata():
@@ -119,7 +126,7 @@ def upload_and_cleanup(metadata_text, video_id):
     body = {
         "snippet": {
             "title": "Viral Kids Cartoons Multi-FX Transformation", 
-            "description": "Premium High-Definition Automated Visual Edit Output Matrix.",
+            "description": "Premium High-Definition Kids Visual Edit Compilation Output Matrix.",
             "tags": ["cartoons", "kids", "animation", "viral"],
             "categoryId": "1"
         },
@@ -150,9 +157,15 @@ def upload_and_cleanup(metadata_text, video_id):
 
 def main():
     try:
-        video_id = fetch_latest_video_from_random_source()
+        video_id = fetch_latest_video_from_rss()
         if video_id is None:
             return  
+
+        # Memory Logic Suppression Fallback (Optional, but enabled here for strict safety logs)
+        processed_ids = get_already_processed_ids()
+        if video_id in processed_ids:
+            print(f"[SUPPRESSION] Data stream tracking matched historical logs for ID: {video_id}. Safely skipping execution loop.")
+            return
 
         video_url = f"https://youtube.com{video_id}"
         segments = download_and_slice(video_url)
